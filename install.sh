@@ -80,14 +80,22 @@ tar -xzf "$WORK/$TARBALL" -C "$WORK"
 
 # --- Install the CLI --------------------------------------------------------------
 
-# Prefer a directory already on PATH that we can write to, rather than reaching for sudo.
+# Prefer somewhere already on PATH that we can write to, rather than reaching for sudo —
+# otherwise the install "succeeds" and the command still isn't found.
+#
+# /opt/homebrew/bin is the Apple Silicon Homebrew prefix and /usr/local/bin the Intel one,
+# so checking only the latter would drop every Silicon user into ~/.local/bin, which isn't
+# on PATH by default.
 if [ -z "$BIN_DIR" ]; then
-    if [ -w /usr/local/bin ] 2>/dev/null; then
-        BIN_DIR="/usr/local/bin"
-    else
-        BIN_DIR="$HOME/.local/bin"
-    fi
+    for candidate in /opt/homebrew/bin /usr/local/bin "$HOME/.local/bin"; do
+        case ":$PATH:" in *":$candidate:"*) ;; *) continue ;; esac
+        [ -d "$candidate" ] && [ -w "$candidate" ] || continue
+        BIN_DIR="$candidate"
+        break
+    done
 fi
+# Nothing on PATH was writable; fall back to the conventional user bin dir and warn later.
+BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
 mkdir -p "$BIN_DIR" || die "Cannot create $BIN_DIR"
 
 install -m 755 "$WORK/simplyteleporter" "$BIN_DIR/simplyteleporter" \

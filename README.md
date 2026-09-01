@@ -35,7 +35,9 @@ device services through [`pymobiledevice3`](https://github.com/doronz88/pymobile
 
 ## Requirements
 
-- **macOS 26** or later, Apple Silicon or Intel
+- **macOS 26** or later. Every release artifact is a universal binary — native on
+  Apple Silicon and on Intel, no Rosetta involved. Check with
+  `lipo -archs $(command -v simplyteleporter)`
 - **An iPhone on USB**, unlocked, trusted, with Developer Mode on
   (Settings › Privacy & Security › Developer Mode — the phone restarts once)
 - **pymobiledevice3**:
@@ -66,8 +68,10 @@ curl -fsSL https://raw.githubusercontent.com/adripoli/Teleporter/main/install.sh
 ```
 --app              also install Teleport.app into /Applications
 --version=v1.0.0   install a specific release (default: latest)
---bin-dir=DIR      where to put simplyteleporter (default: /usr/local/bin,
-                   falling back to ~/.local/bin when that isn't writable)
+--bin-dir=DIR      where to put simplyteleporter. By default the first writable
+                   directory already on your PATH, preferring the Homebrew prefix
+                   (/opt/homebrew/bin on Apple Silicon, /usr/local/bin on Intel)
+                   and falling back to ~/.local/bin
 ```
 </details>
 
@@ -76,14 +80,19 @@ curl -fsSL https://raw.githubusercontent.com/adripoli/Teleporter/main/install.sh
 Grab `Teleport-<version>.dmg` from the [latest release](https://github.com/adripoli/Teleporter/releases/latest)
 and drag Teleport to Applications.
 
-Because these builds are ad-hoc signed rather than notarized, Gatekeeper will refuse the
-first launch. Either **right-click the app › Open** and confirm once, or clear the flag:
+Because these builds are ad-hoc signed rather than notarized, Gatekeeper blocks the first
+launch. Clearing the quarantine flag is the fix, and works on every macOS version:
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/Teleport.app
 ```
 
-The terminal installer above does this for you.
+If you would rather stay in the UI: open the app once and let it be refused, then go to
+System Settings › Privacy & Security and click **Open Anyway** next to the message about
+Teleport. Recent macOS releases no longer accept the old Control-click › Open shortcut for
+unnotarized apps, so that route is worth skipping.
+
+The terminal installer above clears the flag for you.
 
 ### From source
 
