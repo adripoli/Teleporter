@@ -3,8 +3,12 @@
 .swiftpm/
 Package.resolved
 
-# Assembled app bundle — produced by ./build.sh
+# Built binaries — produced by ./build.sh
 Teleport.app/
+/simplyteleporter
+
+# Release artifacts — produced by ./package.sh
+/dist/
 
 # macOS
 .DS_Store
