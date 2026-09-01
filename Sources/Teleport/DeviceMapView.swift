@@ -1,6 +1,7 @@
 import AppKit
 import MapKit
 import SwiftUI
+import TeleportCore
 
 /// A map with a pin you can actually grab.
 ///

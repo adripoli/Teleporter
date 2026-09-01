@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import TeleportCore
 
 /// Shown when `pymobiledevice3` isn't on disk. Without it the app has nothing to drive.
 struct SetupSheet: View {

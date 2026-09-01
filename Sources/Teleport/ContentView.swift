@@ -1,6 +1,7 @@
 import AppKit
 import MapKit
 import SwiftUI
+import TeleportCore
 
 struct ContentView: View {
     @Environment(AppModel.self) private var model

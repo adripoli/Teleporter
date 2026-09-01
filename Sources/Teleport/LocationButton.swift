@@ -1,4 +1,5 @@
 import SwiftUI
+import TeleportCore
 
 /// The floating pin button in the bottom-right corner.
 ///

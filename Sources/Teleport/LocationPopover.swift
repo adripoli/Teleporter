@@ -1,4 +1,5 @@
 import SwiftUI
+import TeleportCore
 
 /// The controls behind the corner pin button: what's happening, where the pin is, and the
 /// two actions that actually touch the phone.

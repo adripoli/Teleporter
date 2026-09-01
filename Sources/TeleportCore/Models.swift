@@ -5,46 +5,46 @@ import Foundation
 ///
 /// Deliberately not `CLLocationCoordinate2D`: this crosses isolation boundaries into the
 /// process layer, and a plain `Sendable`/`Hashable` value keeps that free of ceremony.
-struct Coordinate: Hashable, Sendable, Codable {
-    var latitude: Double
-    var longitude: Double
+public struct Coordinate: Hashable, Sendable, Codable {
+    public var latitude: Double
+    public var longitude: Double
 
-    init(latitude: Double, longitude: Double) {
+    public init(latitude: Double, longitude: Double) {
         self.latitude = latitude
         self.longitude = longitude
     }
 
-    init(_ clCoordinate: CLLocationCoordinate2D) {
+    public init(_ clCoordinate: CLLocationCoordinate2D) {
         self.init(latitude: clCoordinate.latitude, longitude: clCoordinate.longitude)
     }
 
-    var clCoordinate: CLLocationCoordinate2D {
+    public var clCoordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
-    var isValid: Bool {
+    public var isValid: Bool {
         latitude.isFinite && longitude.isFinite
             && (-90.0...90.0).contains(latitude)
             && (-180.0...180.0).contains(longitude)
     }
 
     /// Six decimal places is roughly 10 cm — well past what the device does anything with.
-    var formatted: String {
+    public var formatted: String {
         String(format: "%.6f, %.6f", latitude, longitude)
     }
 
-    static let eiffelTower = Coordinate(latitude: 48.858370, longitude: 2.294481)
+    public static let eiffelTower = Coordinate(latitude: 48.858370, longitude: 2.294481)
 }
 
 /// A device as reported by `pymobiledevice3 usbmux list`.
-struct IOSDevice: Identifiable, Hashable, Sendable, Decodable {
-    let udid: String
-    let name: String
-    let productType: String
-    let productVersion: String
-    let connectionType: String
+public struct IOSDevice: Identifiable, Hashable, Sendable, Decodable {
+    public let udid: String
+    public let name: String
+    public let productType: String
+    public let productVersion: String
+    public let connectionType: String
 
-    var id: String { udid }
+    public var id: String { udid }
 
     enum CodingKeys: String, CodingKey {
         case udid = "UniqueDeviceID"
@@ -56,11 +56,11 @@ struct IOSDevice: Identifiable, Hashable, Sendable, Decodable {
 
     /// `iPhone14,5` → `iPhone 13`-ish. The model table isn't worth carrying, so fall back
     /// to the raw identifier rather than guessing wrong.
-    var modelLabel: String {
+    public var modelLabel: String {
         Self.knownModels[productType] ?? productType
     }
 
-    var menuLabel: String { "\(name) — iOS \(productVersion)" }
+    public var menuLabel: String { "\(name) — iOS \(productVersion)" }
 
     private static let knownModels: [String: String] = [
         "iPhone14,4": "iPhone 13 mini",
@@ -79,26 +79,26 @@ struct IOSDevice: Identifiable, Hashable, Sendable, Decodable {
 }
 
 /// A failure from the device tooling, translated into something worth showing a person.
-struct DeviceError: LocalizedError, Sendable {
-    let message: String
-    let recovery: String?
-    let detail: String?
+public struct DeviceError: LocalizedError, Sendable {
+    public let message: String
+    public let recovery: String?
+    public let detail: String?
 
-    var errorDescription: String? { message }
-    var recoverySuggestion: String? { recovery }
+    public var errorDescription: String? { message }
+    public var recoverySuggestion: String? { recovery }
 
-    init(message: String, recovery: String? = nil, detail: String? = nil) {
+    public init(message: String, recovery: String? = nil, detail: String? = nil) {
         self.message = message
         self.recovery = recovery
         self.detail = detail
     }
 
-    static let toolMissing = DeviceError(
+    public static let toolMissing = DeviceError(
         message: "pymobiledevice3 isn't installed.",
         recovery: "Install it with: pipx install pymobiledevice3"
     )
 
-    static let noDeviceSelected = DeviceError(
+    public static let noDeviceSelected = DeviceError(
         message: "No iPhone selected.",
         recovery: "Connect your iPhone over USB and pick it in the toolbar."
     )
@@ -107,7 +107,7 @@ struct DeviceError: LocalizedError, Sendable {
     ///
     /// Exit status alone isn't trustworthy here: pymobiledevice3 has paths that report a
     /// hard failure on stderr and still exit 0, so the streams have to be inspected too.
-    static func indicatesFailure(_ result: CommandResult) -> Bool {
+    public static func indicatesFailure(_ result: CommandResult) -> Bool {
         if !result.succeeded { return true }
 
         let stderr = result.standardError
@@ -125,7 +125,7 @@ struct DeviceError: LocalizedError, Sendable {
     ///
     /// pymobiledevice3 renders tracebacks through `rich`, so the useful line is usually the
     /// last one outside the box-drawing frame.
-    static func from(_ result: CommandResult) -> DeviceError {
+    public static func from(_ result: CommandResult) -> DeviceError {
         let combined = result.standardError + "\n" + result.standardOutput
 
         if combined.contains("DeviceLocked") {

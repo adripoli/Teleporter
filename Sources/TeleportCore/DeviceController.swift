@@ -5,8 +5,12 @@ import Foundation
 /// Every call goes through `--native`, which piggybacks Apple's own `remoted` tunnel via
 /// `remotepairingd`. That's what keeps this root-free on iOS 17+ and lets it coexist with
 /// Xcode and `devicectl` instead of fighting them for the tunnel.
-struct DeviceController: Sendable {
-    let executable: URL
+public struct DeviceController: Sendable {
+    public let executable: URL
+
+    public init(executable: URL) {
+        self.executable = executable
+    }
 
     /// Printed by `simulate-location set` once the location has been applied and it's
     /// parked waiting for a signal. Its appearance is our proof the work succeeded.
@@ -15,7 +19,7 @@ struct DeviceController: Sendable {
     // MARK: - Locating the tool
 
     /// pipx puts its shims in `~/.local/bin`; Homebrew uses one of the two prefixes.
-    static func locate() -> URL? {
+    public static func locate() -> URL? {
         let home = FileManager.default.homeDirectoryForCurrentUser
         let candidates = [
             home.appending(path: ".local/bin/pymobiledevice3"),
@@ -54,7 +58,7 @@ struct DeviceController: Sendable {
 
     // MARK: - Devices
 
-    func listDevices() async throws -> [IOSDevice] {
+    public func listDevices() async throws -> [IOSDevice] {
         let result = try await run(["usbmux", "list"], timeout: .seconds(30))
         guard !DeviceError.indicatesFailure(result) else { throw DeviceError.from(result) }
 
@@ -69,7 +73,7 @@ struct DeviceController: Sendable {
 
     /// The DVT services that back location simulation only exist once the personalised
     /// developer disk image is mounted. It survives reboots, so this is usually a no-op.
-    func isDeveloperImageMounted(udid: String) async throws -> Bool {
+    public func isDeveloperImageMounted(udid: String) async throws -> Bool {
         let result = try await run(["mounter", "list", "--udid", udid], timeout: .seconds(45))
         guard !DeviceError.indicatesFailure(result) else { throw DeviceError.from(result) }
 
@@ -79,7 +83,7 @@ struct DeviceController: Sendable {
 
     /// Fetches and mounts the image for this exact build. Needs the phone unlocked, and
     /// makes a TSS request to Apple, so it gets a long leash.
-    func mountDeveloperImage(udid: String) async throws {
+    public func mountDeveloperImage(udid: String) async throws {
         try await runExpectingSuccess(["mounter", "auto-mount", "--udid", udid], timeout: .seconds(300))
     }
 
@@ -89,7 +93,7 @@ struct DeviceController: Sendable {
     ///
     /// The returned handle owns the session: the location holds for as long as it lives,
     /// and the caller must `terminate()` it to end the simulation or replace it.
-    func startLocationSession(_ coordinate: Coordinate, udid: String) async throws -> ParkedProcess {
+    public func startLocationSession(_ coordinate: Coordinate, udid: String) async throws -> ParkedProcess {
         do {
             return try await ProcessRunner.startParked(
                 executable: executable,
@@ -109,7 +113,7 @@ struct DeviceController: Sendable {
         }
     }
 
-    func clearLocation(udid: String) async throws {
+    public func clearLocation(udid: String) async throws {
         try await runExpectingSuccess(
             ["developer", "dvt", "simulate-location", "clear", "--native", "--udid", udid],
             timeout: .seconds(90)

@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Observation
+import TeleportCore
 
 /// Whether the backing CLI is available.
 enum ToolState: Equatable {

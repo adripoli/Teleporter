@@ -1,21 +1,21 @@
 import Foundation
 
 /// The outcome of running a command line tool to completion.
-struct CommandResult: Sendable {
-    let exitCode: Int32
-    let standardOutput: String
-    let standardError: String
+public struct CommandResult: Sendable {
+    public let exitCode: Int32
+    public let standardOutput: String
+    public let standardError: String
 
-    var succeeded: Bool { exitCode == 0 }
+    public var succeeded: Bool { exitCode == 0 }
 }
 
-enum CommandError: LocalizedError {
+public enum CommandError: LocalizedError {
     case launchFailed(String)
     case timedOut(Duration)
     /// A tool expected to park instead exited on its own — meaning it failed.
     case exitedBeforeReady(CommandResult)
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .launchFailed(let reason):
             "Couldn't start pymobiledevice3: \(reason)"
@@ -101,7 +101,7 @@ private final class OneShotSignal: @unchecked Sendable {
 /// `simulate-location set` keeps the DVT session open for as long as it runs, so the
 /// object that owns this handle owns the simulation. Dropping it without calling
 /// `terminate()` leaks a child process — macOS does not reap orphans for us.
-final class ParkedProcess: @unchecked Sendable {
+public final class ParkedProcess: @unchecked Sendable {
     private let lock = NSLock()
     private let process: Process
     private let outPipe: Pipe
@@ -114,11 +114,11 @@ final class ParkedProcess: @unchecked Sendable {
         self.errPipe = errPipe
     }
 
-    var isRunning: Bool {
+    public var isRunning: Bool {
         lock.withLock { process.isRunning }
     }
 
-    func terminate() {
+    public func terminate() {
         lock.withLock {
             guard !isTornDown else { return }
             isTornDown = true
@@ -178,12 +178,12 @@ private struct Launch {
 
 // MARK: - Runner
 
-enum ProcessRunner {
+public enum ProcessRunner {
     /// Runs `executable` to completion, capturing both streams.
     ///
     /// Both pipes are drained continuously so a chatty tool can't deadlock by filling the
     /// 64 KB pipe buffer while we wait on exit.
-    static func run(
+    public static func run(
         executable: URL,
         arguments: [String],
         environment: [String: String],
@@ -217,7 +217,7 @@ enum ProcessRunner {
     /// hand back a live handle the caller keeps for as long as the session should last.
     ///
     /// - Throws: `CommandError.exitedBeforeReady` if it exits first, which means it failed.
-    static func startParked(
+    public static func startParked(
         executable: URL,
         arguments: [String],
         environment: [String: String],
