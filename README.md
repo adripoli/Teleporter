@@ -23,7 +23,7 @@ Two front ends, one engine:
  ╭─ ARRIVED ──────────────────────────────────────────────────────╮
  │  latitude   48.858300° N                                       │
  │  longitude  2.294500° E                                        │
- │  device     Adrian's iPhone · iPhone 15 Pro                    │
+ │  device     Adripoli's iPhone · iPhone 15 Pro                    │
  │  holding — the phone stays here until you clear or quit        │
  ╰────────────────────────────────────────────────────────────────╯
 ```
